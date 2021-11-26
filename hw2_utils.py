@@ -6,16 +6,22 @@ def user_exists(username_to_check):
     conn = None
     try:
         conn = sqlite3.connect('users.db')
-        query = sql.SQL("SELECT username, password"
-                        " FROM Users"
-                        " WHERE username = {var}").format(var=sql.Literal(username_to_check))
-        rows_effected, res = conn.execute(query)
+        cur = conn.cursor()
+        # query = sql.SQL("SELECT username, password"
+        #                 " FROM Users"
+        #                 " WHERE username = {var}").format(var=sql.Literal(username_to_check))
+        # rows_effected, res = conn.execute(str(query))
+        # rows_effected, res = conn.execute("SELECT username, password FROM Users WHERE username = (?)", username_to_check)
+        cur.execute("SELECT username, password FROM Users WHERE username=:user_name",
+                                          {"user_name": username_to_check})
+        rows_effected = cur.fetchall()
         conn.commit()
-    except Exception:
+    except Exception as e:
+        print("..e is: ", e)
         conn.close()
         return False
     conn.close()
-    if rows_effected <= 0:
+    if len(rows_effected) <= 0:
         return False
     else:
         return True
@@ -47,10 +53,14 @@ def user_insert(username_to_insert, password_to_insert):
     conn = None
     try:
         conn = sqlite3.connect('users.db')
-        query = sql.SQL("INSERT INTO Users(username, password) VALUES({u_var}, {p_var});").format(u_var=sql.Literal(username_to_insert), p_var=sql.Literal(password_to_insert))
-        conn.execute(query)
+        # query = sql.SQL("INSERT INTO Users(username, password) VALUES({username}, {password});")\
+        #     .format(username=sql.Literal(username_to_insert), password=sql.Literal(password_to_insert))
+        # conn.execute(str(query))
+        conn.execute("INSERT INTO Users VALUES (?, ?)", (username_to_insert, password_to_insert))
+
         conn.commit()
-    except Exception:
+    except Exception as e:
+        print("e is: ", e)
         conn.close()
         return False
     conn.close()

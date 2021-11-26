@@ -141,7 +141,18 @@ if __name__ == "__main__":
                                         and admin_password_to_check == admin_pass:
                                     # create the user!
                                     # add username_to_handle and userpass_to_handle to DB
-                                    print("create the user! add to the database")
+                                    # print("create the user! add to the database")
+                                    if hw2_utils.user_exists(username_to_handle):
+                                        print("User already exists")
+                                        print("Error 409 Conflict")
+                                    else:
+                                        print("Doesn't exists or DB exists Error")
+                                    # if not hw2_utils.user_insert(username_to_handle, userpass_to_handle):
+                                    #     print("DB Error")
+                                    #     print("print 500")
+                                    # else:
+                                    #     print("User Inserted!")
+                                    #     print("Sanity Check: user_exists? ", hw2_utils.user_exists(username_to_handle))
                                 else:
                                     # invalid admin credentials
                                     print("invalid admin credentials! send the right error (401/403)")
