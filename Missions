@@ -1,21 +1,21 @@
 
 1.  understand and implement  async server ## Most important(look at tips)
 
-2.TODO: update the error handling to include headers and update all headers to include content/len
+2. TODO: update the error handling to include headers
+   TODO: and update all headers to include content/len
 
-3. TODO: choose the right package for parsing the Mime json file and  write code for extracting right content type
-
-4.  TODO: add support for Post + Delete requests
-
-5. Post + Delete requests check for admin , GET requests check for valid users
+4. TODO: add support for Post + Delete requests
+   Post + Delete requests check for admin, GET requests check for valid users
 
 6. API for users (insert + delete + check if exists )
 
 7. understand how to  implement dynamic pages with parser
 
-8. TODO:extract the port number from the config.py (open the file to a string, then take the first line, split by : and take the second and finished.)
-
 9. set up a timer through each connection with timeout parameter  (open timer when accepting a conncetion and change the while true to while timeout<=timeout(param)
 
-10. add support for params for GET requests
+10. add support for parameters for GET requests
 
+done:
+
+3. choose the right package for parsing the Mime json file and write code for extracting right content type
+8. extract the port number from the config.py (open the file to a string, then take the first line, split by : and take the second and finished.)
