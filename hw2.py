@@ -66,6 +66,11 @@ if __name__ == "__main__":
     # print(b'YWRtaW46YWRtaW4=' == encoded)
 
     # conn_db = sqlite3.connect('users.db')
+    # str_test = "DELETE /users/david HTTP/1.1\r\n"
+    # username_to_delete = str_test.split(' ')[1].split('/')[-1]
+    # print(username_to_delete)
+
+    # print(hw2_utils.user_credentials_valid("user555", "12345"))
 
     while True:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -145,14 +150,12 @@ if __name__ == "__main__":
                                     if hw2_utils.user_exists(username_to_handle):
                                         print("User already exists")
                                         print("Error 409 Conflict")
+                                    elif not hw2_utils.user_insert(username_to_handle, userpass_to_handle):
+                                        print("DB Error")
+                                        print("print 500 Internal Server Error")
                                     else:
-                                        print("Doesn't exists or DB exists Error")
-                                    # if not hw2_utils.user_insert(username_to_handle, userpass_to_handle):
-                                    #     print("DB Error")
-                                    #     print("print 500")
-                                    # else:
-                                    #     print("User Inserted!")
-                                    #     print("Sanity Check: user_exists? ", hw2_utils.user_exists(username_to_handle))
+                                        print("User Inserted!")
+                                        print("Sanity Check: user_exists? ", hw2_utils.user_exists(username_to_handle))
                                 else:
                                     # invalid admin credentials
                                     print("invalid admin credentials! send the right error (401/403)")
@@ -185,9 +188,11 @@ if __name__ == "__main__":
                             # 1\r\n
                             # Authorization: Basic … …
                             # header # K\r\n
+                            username_to_delete = http_data['Request'].split(' ')[1].split('/')[-1]
+                            print(username_to_delete)
                             auth_value = http_data['Authorization']
                             if auth_value:  # TODO: there is no check like this. it sends KeyError and exits.
-                                print("meaning there is credentials")
+                                # print("meaning there is credentials")
                                 basic_str = "Basic "
                                 encoded = auth_value[len(basic_str):]
 
@@ -196,13 +201,19 @@ if __name__ == "__main__":
                                 admin_password_to_check = decoded.split(b':')[1].decode()
                                 if admin_username_to_check == admin_username \
                                         and admin_password_to_check == admin_pass:
-                                    # check if the user exists on DB
+                                    # Check if the user exists on DB.
+                                    # if user doesn't exists return Error 409 Conflict?
+                                    if not hw2_utils.user_exists(username_to_delete):
+                                        print(username_to_delete)
+                                        print("User:" + username_to_delete + "Doesn't exists")
+                                        print("Error 409 Conflict")
+                                    # if exists, delete the user! delete username_to_handle from DB
+                                    elif not hw2_utils.user_delete(username_to_delete):
+                                        print("DB Error")
+                                        print("print 500 Internal Server Error")
+                                    else:  # deleted successfully
+                                        print("send 200 OK")
 
-                                    # if user doesn't exists return Error 509 Conflict?
-
-                                    # if exists, delete the user!
-                                    # delete username_to_handle and userpass_to_handle from DB
-                                    print(" if exists, delete the user from database")
                                 else:
                                     # invalid admin credentials
                                     print("invalid admin credentials! send the right error (401/403)")

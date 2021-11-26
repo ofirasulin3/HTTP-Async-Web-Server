@@ -1,5 +1,4 @@
 import sqlite3
-from psycopg2 import sql
 
 
 def user_exists(username_to_check):
@@ -12,8 +11,8 @@ def user_exists(username_to_check):
         #                 " WHERE username = {var}").format(var=sql.Literal(username_to_check))
         # rows_effected, res = conn.execute(str(query))
         # rows_effected, res = conn.execute("SELECT username, password FROM Users WHERE username = (?)", username_to_check)
-        cur.execute("SELECT username, password FROM Users WHERE username=:user_name",
-                                          {"user_name": username_to_check})
+        cur.execute("SELECT username FROM Users WHERE username=:user_name",
+                    {"user_name": username_to_check})
         rows_effected = cur.fetchall()
         conn.commit()
     except Exception as e:
@@ -33,17 +32,22 @@ def user_credentials_valid(username_to_check, password_to_check):
     conn = None
     try:
         conn = sqlite3.connect('users.db')
-        query = sql.SQL("SELECT username, password"
-                        " FROM Users"
-                        " WHERE username = {var1} AND password = {var2}").format(var1=sql.Literal(username_to_check),
-                                          var2=sql.Literal(password_to_check))
-        rows_effected, res = conn.execute(query)
+        # query = sql.SQL("SELECT username, password"
+        #                 " FROM Users"
+        #                 " WHERE username = {var1} AND password = {var2}").format(var1=sql.Literal(username_to_check),
+        #                                   var2=sql.Literal(password_to_check))
+        # rows_effected, res = conn.execute(query)
+        cur = conn.cursor()
+        cur.execute("SELECT username, password FROM Users WHERE username =:user_name AND password =:pass_word",
+                    {"user_name": username_to_check, "pass_word": password_to_check})
+        rows_effected = cur.fetchall()
         conn.commit()
-    except Exception:
+    except Exception as e:
+        print("..e is: ", e)
         conn.close()
         return False
     conn.close()
-    if rows_effected <= 0:
+    if len(rows_effected) <= 0:
         return False
     else:
         return True
@@ -66,19 +70,25 @@ def user_insert(username_to_insert, password_to_insert):
     conn.close()
     return True
 
+
 def user_delete(username_to_delete):
     # if not user_exists(username_to_check):
     #     return False
     conn = None
     try:
         conn = sqlite3.connect('users.db')
-        query = sql.SQL("DELETE FROM  Users WHERE username = {var1}").format(var1=sql.Literal(username_to_delete))
-        rows_effected, _ = conn.execute(query)
+        cur = conn.cursor()
+        # query = sql.SQL("DELETE FROM Users WHERE username = {var1}").format(var1=sql.Literal(username_to_delete))
+        # rows_effected, _ = conn.execute(str(query))
+        cur.execute("DELETE FROM Users WHERE username=:user_name",
+                    {"user_name": username_to_delete})
+        # rows_effected = cur.fetchall()
         conn.commit()
-        if rows_effected == 0:
+        if cur.rowcount <= 0:
             conn.close()
             return False
-    except Exception:
+    except Exception as e:
+        print("..e is: ", e)
         conn.close()
         return False
     conn.close()
@@ -92,8 +102,6 @@ The first request line (e.g. "GET www.google.com ....") key is 'Request'
 input: HTTP raw request, in bytes.
 output: A dictionary of the parsed request
 '''
-
-
 def decode_http(http_data):
     http_dict = {}
     fields = http_data.decode('utf-8').split("\r\n")  # convert to string from bytes
