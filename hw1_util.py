@@ -1,8 +1,8 @@
 import socket
-import hw1_utils
+
 import os
 import datetime
-from pdfminer.high_level import extract_text
+
 import glob
 
 

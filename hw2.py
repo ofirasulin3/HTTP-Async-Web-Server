@@ -5,6 +5,7 @@ import time
 import socket
 import hw2_utils
 import base64
+import os
 
 
 # def check_error(data, conn):
@@ -40,6 +41,7 @@ import base64
     # response += str.encode("\r\n")
     # conn.sendall(response)
     # return response_status
+from hw1_util import check_if_file_exists
 
 
 def mime_parsing(key):
@@ -52,6 +54,8 @@ def mime_parsing(key):
     return -1
 
 if __name__ == "__main__":
+
+
 
     # getting parameters from config file
     config_file = open("config.py", "r")
@@ -118,7 +122,13 @@ if __name__ == "__main__":
                         # if user is unauthorized or its not the admin, return 401 Udnauthorized
 
                         # POST request is for Creating a User
+
                         if request_type == "POST":
+                            if request.split(' ')[1] != "/users":
+                                response_status = '501'
+                                response_message = "Not Implemented"
+                                print("501 Not Implemented")
+
                             # http_data_example =
                             # "POST /users HTTP/1.1\r\n
                             # header 1\r\n …
@@ -217,6 +227,75 @@ if __name__ == "__main__":
                                 else:
                                     # invalid admin credentials
                                     print("invalid admin credentials! send the right error (401/403)")
+
+
+
+                        if request_type == "GET":
+                            filename_path = request.split(' ')[1][1:]
+                            file = check_if_file_exists(filename_path)
+                            if not file:
+                                response_status = '404'
+                                response = str.encode(response_proto)
+                                response += b' '
+                                response += str.encode(response_status)
+                                response += b' '
+                                response += str.encode("Not Found\r\n")
+                                conn.sendall(response)
+                                break
+                            file_extension = filename_path.split('.')[1]
+                            file_content_type = mime_parsing(file_extension)
+
+                            if file_extension == "dp":
+                                auth_value = http_data['Authorization']
+                                if auth_value:
+                                    # meaning there is credentials
+                                    basic_str = "Basic "
+                                    encoded = auth_value[len(basic_str):]
+                                    decoded = base64.b64decode(encoded)
+                                    admin_username_to_check = decoded.split(b':')[0].decode()
+                                    # print("admin_username_to_check:", admin_username_to_check)
+                                    admin_password_to_check = decoded.split(b':')[1].decode()
+                                    if not hw2_utils.user_credentials_valid(admin_username_to_check, admin_password_to_check):
+                                        print("USER DOES NOT EXISTS / WRONG CREDENTIALS")
+                                    else:
+
+                                        print("ADD SOME LOGIC TO DYNAMIC PAGES")
+
+
+
+
+
+                            else:
+                                print("regular files logic")
+                                response = str.encode(response_proto)
+                                response += b' '
+                                response_status = '200'  # in case of success (valid) return status 200
+                                response += str.encode(response_status)
+                                response += b' '
+                                response += str.encode("OK\r\n")
+
+                                current_date = datetime.datetime.now()
+                                response_headers_date = current_date.strftime("%d-%b-%Y (%H:%M:%S.%f)")
+                                response_headers_content_type = "Content-Type: "+file_extension
+                                response_headers_content_len = os.path.getsize(filename_path)
+                                response_headers = response_headers_date + "\r\n" + response_headers_content_type + "\r\n"
+                                response += str.encode(response_headers)
+                                response += b'\r\n'  # to separate headers from body
+                                output = open(filename_path, 'rb')
+                                response += output.read()
+                                conn.sendall(response)
+                                output.close()
+
+
+
+
+
+
+
+
+
+
+
 
                         # 401 unauthorized
                         # 403 forbidden
