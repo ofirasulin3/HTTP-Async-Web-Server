@@ -5,4 +5,3 @@
 {% "<p>We know that your name is {username}</p>".format(username=user['username']) if user['authenticated'] else '' %}
 </body>
 </html>
-

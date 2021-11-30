@@ -1,18 +1,10 @@
-def parsing(dynamic_page, username, authenticated):
+
+
+def dp_parsing(dynamic_page_path, username, authenticated, params):
     f = open("gen.py", "w")
-    # f.write("eval(context)")
     user = {"authenticated": authenticated, "username": username}
 
-    # splitted = dynamic_page.split('{')
-    # for
-    # for char in dynamic_page:
-
-    # while dynamic_page[i]:
-    #     if dynamic_page[i]!='{'
-    #         f.write
-
-    with open(dynamic_page) as dp:
-        f.write('\"')
+    with open(dynamic_page_path) as dp:
         line = dp.readline()
         while line:
             i = 0
@@ -23,17 +15,14 @@ def parsing(dynamic_page, username, authenticated):
                 tmp_exp = ""
                 while c != '{':
                     if c != '\n':
-                        if c != '\"':
-                            tmp_exp += c
-                        else:
-                            tmp_exp += "\'"
+                        tmp_exp += c
                     i += 1
                     if i >= len(line):
                         break
                     c = line[i]
 
                 if tmp_exp != "":
-                    f.write('print(\\"' + tmp_exp + '\\")\\n')
+                    f.write(tmp_exp + '\n')
                 if tmp_exp == "</html>":
                     x = 2
                 if i >= len(line):
@@ -53,22 +42,25 @@ def parsing(dynamic_page, username, authenticated):
                 tmp_str = ""
                 while c != '%':
                     if c != '\n':
-                        if c != '\"':
-                            tmp_str += c
-                        else:
-                            tmp_str += "\'"
+                        tmp_str += c
                     i += 1
                     if i >= len(line):
                         break
                     c = line[i]
+                i += 1
+                if i >= len(line):
+                    break
+                c = line[i]
 
+                if c == '}':
+                    i += 1
+                    if i >= len(line):
+                        break
                 if tmp_str != "":
-                    f.write(tmp_str + "\\n")
+                    f.write(eval(tmp_str) + "\n")
 
                 i += 1
             line = dp.readline()
 
-    # print("created file after parsing is: \n", f)
-    f.write('\"')
     f.close()
     return f

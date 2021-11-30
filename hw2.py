@@ -42,7 +42,7 @@ import os
     # return response_status
 
 # from hw2_util import check_if_file_exists
-from template_parser import parsing
+from template_parser import dp_parsing
 
 
 def mime_parsing(key):
@@ -56,26 +56,6 @@ def mime_parsing(key):
 
 if __name__ == "__main__":
 
-    parsing("example.dp", "david", True)
-    # f_str = open(parsed,"r")
-    f_str = open("gen.py", "r")
-
-    f_string = f_str.read()
-
-    # f_str2 = "print('david: ')"
-    # print("eval2: \n", eval(f_str2))
-    # a = exec(f_str)
-    # a = exec('print("<html lang=\'en\'>")')
-    # a = exec("print(\"<html lang='en'>\")"
-    # print(f_string)
-    eval(f_string)
-    eval("print(\"<!DOCTYPE html>\")\nprint(\"<html lang='en'>\")\nprint(\"<body>\")\nprint(\"<p> \")\n 'Hi ' + user['username'] if user['authenticated'] else 'Please authenticate so we'll know your name' \nprint(\"} </p>\")\n '<p>We know that your name is {username}</p>'.format(username=user['username']) if user['authenticated'] else '' \nprint(\"}\")\nprint(\"</body>\")\nprint(\"</html>\")\n")
-
-    # exec(f_string)
-
-    # print("eval: \n", exec(f_str))
-    # print(a)
-    exit(3)
     # getting parameters from config file
     config_file = open("config.py", "r")
     lines = config_file.readlines()
@@ -202,9 +182,8 @@ if __name__ == "__main__":
 
                                 current_date = datetime.datetime.now()
                                 response_headers_date = current_date.strftime("%d-%b-%Y (%H:%M:%S.%f)")
-                                # response_headers_content_type = "Content-Type: image/png"
                                 response_headers_content_len = "Content-Length: 0"
-                                response_headers = response_headers_date + "\r\n" + response_headers_content_len + "\r\n"
+                                response_headers = response_headers_date + "\r\n" + str(response_headers_content_len) + "\r\n"
                                 response += str.encode(response_headers)
                                 response += str.encode("Connection: keep-alive\r\n")
                                 response += str.encode("WWW-Authenticate: Basic realm=\"HW2 realm\"\r\n")
@@ -248,11 +227,10 @@ if __name__ == "__main__":
                                     print("invalid admin credentials! send the right error (401/403)")
 
 
-
                         if request_type == "GET":
                             filename_path = request.split(' ')[1][1:]
-                            file = hw2_utils.check_if_file_exists(filename_path)
-                            if not file:
+                            file_exists = hw2_utils.check_if_file_exists(filename_path)
+                            if not file_exists:
                                 response_status = '404'
                                 response = str.encode(response_proto)
                                 response += b' '
@@ -271,15 +249,43 @@ if __name__ == "__main__":
                                     basic_str = "Basic "
                                     encoded = auth_value[len(basic_str):]
                                     decoded = base64.b64decode(encoded)
-                                    admin_username_to_check = decoded.split(b':')[0].decode()
+                                    username_to_check = decoded.split(b':')[0].decode()
                                     # print("admin_username_to_check:", admin_username_to_check)
-                                    admin_password_to_check = decoded.split(b':')[1].decode()
-                                    if not hw2_utils.user_credentials_valid(admin_username_to_check, admin_password_to_check):
-                                        print("USER DOES NOT EXISTS / WRONG CREDENTIALS")
+                                    userpassword_to_check = decoded.split(b':')[1].decode()
+
+                                    if not hw2_utils.user_credentials_valid(username_to_check, userpassword_to_check):
+                                        authenticated = False
+                                        print("User credentials are not valid")
                                     else:
+                                        authenticated = True
+                                        print("Building the Dynamic Page")
+                                    params_dict = {}
+                                    if URL.find('?') != -1:
+                                        params_str = URL.split('?')[1].split['&']
+                                        for param in params_str:
+                                            key = param.split['='][0]
+                                            value = param.split['='][1]
+                                            params_dict[key] = value
+                                    dp_parsing(filename_path, username_to_check, authenticated, params_dict)
 
-                                        print("ADD SOME LOGIC TO DYNAMIC PAGES")
+                                    response = str.encode(response_proto)
+                                    response += b' '
+                                    response_status = '200'  # in case of success (valid) return status 200
+                                    response += str.encode(response_status)
+                                    response += b' '
+                                    response += str.encode("OK\r\n")
 
+                                    current_date = datetime.datetime.now()
+                                    response_headers_date = current_date.strftime("%d-%b-%Y (%H:%M:%S.%f)")
+                                    response_headers_content_type = "Content-Type: text/html"
+                                    response_headers_content_len = os.path.getsize("gen.py")
+                                    response_headers = response_headers_date + "\r\n" + str(response_headers_content_len) + "\r\n" + response_headers_content_type + "\r\n"
+                                    response += str.encode(response_headers)
+                                    response += b'\r\n'  # to separate headers from body
+                                    output = open("gen.py", 'rb')
+                                    response += output.read()
+                                    conn.sendall(response)
+                                    output.close()
 
 
 
@@ -297,7 +303,7 @@ if __name__ == "__main__":
                                 response_headers_date = current_date.strftime("%d-%b-%Y (%H:%M:%S.%f)")
                                 response_headers_content_type = "Content-Type: "+file_extension
                                 response_headers_content_len = os.path.getsize(filename_path)
-                                response_headers = response_headers_date + "\r\n" + response_headers_content_type + "\r\n"
+                                response_headers = response_headers_date + "\r\n" + str(response_headers_content_len) + "\r\n" + response_headers_content_type + "\r\n"
                                 response += str.encode(response_headers)
                                 response += b'\r\n'  # to separate headers from body
                                 output = open(filename_path, 'rb')
