@@ -40,7 +40,8 @@ import os
     # response += str.encode("\r\n")
     # conn.sendall(response)
     # return response_status
-from hw1_util import check_if_file_exists
+
+# from hw2_util import check_if_file_exists
 from template_parser import parsing
 
 
@@ -59,12 +60,22 @@ if __name__ == "__main__":
     # f_str = open(parsed,"r")
     f_str = open("gen.py", "r")
 
-    f_str = f_str.read()
+    f_string = f_str.read()
+
     # f_str2 = "print('david: ')"
     # print("eval2: \n", eval(f_str2))
-    eval(f_str)
-    # print("eval: \n", eval(f_str))
+    # a = exec(f_str)
+    # a = exec('print("<html lang=\'en\'>")')
+    # a = exec("print(\"<html lang='en'>\")"
+    # print(f_string)
+    eval(f_string)
+    eval("print(\"<!DOCTYPE html>\")\nprint(\"<html lang='en'>\")\nprint(\"<body>\")\nprint(\"<p> \")\n 'Hi ' + user['username'] if user['authenticated'] else 'Please authenticate so we'll know your name' \nprint(\"} </p>\")\n '<p>We know that your name is {username}</p>'.format(username=user['username']) if user['authenticated'] else '' \nprint(\"}\")\nprint(\"</body>\")\nprint(\"</html>\")\n")
 
+    # exec(f_string)
+
+    # print("eval: \n", exec(f_str))
+    # print(a)
+    exit(3)
     # getting parameters from config file
     config_file = open("config.py", "r")
     lines = config_file.readlines()
@@ -240,7 +251,7 @@ if __name__ == "__main__":
 
                         if request_type == "GET":
                             filename_path = request.split(' ')[1][1:]
-                            file = check_if_file_exists(filename_path)
+                            file = hw2_utils.check_if_file_exists(filename_path)
                             if not file:
                                 response_status = '404'
                                 response = str.encode(response_proto)

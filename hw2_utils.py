@@ -1,5 +1,8 @@
 import sqlite3
+import os
 
+def check_if_file_exists(path_photo):
+    return os.path.exists(path_photo)
 
 def user_exists(username_to_check):
     conn = None
