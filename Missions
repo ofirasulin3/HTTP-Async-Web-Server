@@ -1,17 +1,23 @@
 
 1. TODO: add support for parameters for GET requests.
-   in GET requests, check for valid users/admin
+   in GET dp requests, check for valid users/admin
 
 2. TODO: add support for Post request without Authorization field, if needed
 
 3. TODO: understand how to implement dynamic pages with parser
 
 4. TODO: understand and implement async server ## Most important(look at tips)
+    make the read from mime.json await (needs to be non-blocking)
 
 5. update the error handling to include headers
    and update all headers to include content/len
 
 6. check for /users in a post request
+
+7. make sure no client can access the users.db file and the config.py file.
+
+8. pass on the instructions again
+
 
 done:
 

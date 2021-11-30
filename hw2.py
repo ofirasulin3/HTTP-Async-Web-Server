@@ -1,6 +1,5 @@
 import datetime
 import json
-import sqlite3
 import time
 import socket
 import hw2_utils
@@ -42,6 +41,7 @@ import os
     # conn.sendall(response)
     # return response_status
 from hw1_util import check_if_file_exists
+from template_parser import parsing
 
 
 def mime_parsing(key):
@@ -55,7 +55,15 @@ def mime_parsing(key):
 
 if __name__ == "__main__":
 
+    parsing("example.dp", "david", True)
+    # f_str = open(parsed,"r")
+    f_str = open("gen.py", "r")
 
+    f_str = f_str.read()
+    # f_str2 = "print('david: ')"
+    # print("eval2: \n", eval(f_str2))
+    eval(f_str)
+    # print("eval: \n", eval(f_str))
 
     # getting parameters from config file
     config_file = open("config.py", "r")
