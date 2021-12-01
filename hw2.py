@@ -346,7 +346,6 @@ if __name__ == "__main__":
                                 # meaning there is credentials
                                 auth_value = http_data['Authorization']
                                 basic_str = "Basic "
-                                print("-", auth_value[0:7], "-")
                                 if auth_value[0:7] != " Basic ":
                                     response_status = '400'
                                     response = str.encode(response_proto)
