@@ -150,6 +150,18 @@ if __name__ == "__main__":
                                 response += str.encode(response_status)
                                 response += b' '
                                 response += str.encode("Unauthorized\r\n")
+
+                                current_date = datetime.datetime.now()
+                                response_headers_date = current_date.strftime("%d-%b-%Y (%H:%M:%S.%f)")
+                                response_headers_content_len = "Content-Length: 0"
+                                response_headers = response_headers_date + "\r\n" + str(
+                                    response_headers_content_len) + "\r\n"
+                                response += str.encode(response_headers)
+                                response += str.encode("Connection: keep-alive\r\n")
+                                response += str.encode("WWW-Authenticate: Basic realm=\"HW2 realm\"\r\n")
+                                response += b'\r\n'  # to separate headers from body
+                                conn.sendall(response)
+
                                 conn.sendall(response)
                                 break
                             else:
@@ -208,26 +220,26 @@ if __name__ == "__main__":
                                         conn.sendall(response)
                                         break
 
-                            else:  # meaning there are no credentials
-                                # In case authorization field doesn't exist,
-                                # we will send a response with a form for authentication:
-                                response = str.encode(response_proto)
-                                response += b' '
-                                response_status = '401'
-                                response += str.encode(response_status)
-                                response += b' '
-                                response += str.encode("Unauthorized\r\n")
-                                response += b'\r\n'
-
-                                current_date = datetime.datetime.now()
-                                response_headers_date = current_date.strftime("%d-%b-%Y (%H:%M:%S.%f)")
-                                response_headers_content_len = "Content-Length: 0"
-                                response_headers = response_headers_date + "\r\n" + str(response_headers_content_len) + "\r\n"
-                                response += str.encode(response_headers)
-                                response += str.encode("Connection: keep-alive\r\n")
-                                response += str.encode("WWW-Authenticate: Basic realm=\"HW2 realm\"\r\n")
-                                response += b'\r\n'  # to separate headers from body
-                                conn.sendall(response)
+                            # else: # meaning there are no credentials
+                            #     # In case authorization field doesn't exist,
+                            #     # we will send a response with a form for authentication:
+                            #     response = str.encode(response_proto)
+                            #     response += b' '
+                            #     response_status = '401'
+                            #     response += str.encode(response_status)
+                            #     response += b' '
+                            #     response += str.encode("Unauthorized\r\n")
+                            #     response += b'\r\n'
+                            #
+                            #     current_date = datetime.datetime.now()
+                            #     response_headers_date = current_date.strftime("%d-%b-%Y (%H:%M:%S.%f)")
+                            #     response_headers_content_len = "Content-Length: 0"
+                            #     response_headers = response_headers_date + "\r\n" + str(response_headers_content_len) + "\r\n"
+                            #     response += str.encode(response_headers)
+                            #     response += str.encode("Connection: keep-alive\r\n")
+                            #     response += str.encode("WWW-Authenticate: Basic realm=\"HW2 realm\"\r\n")
+                            #     response += b'\r\n'  # to separate headers from body
+                            #     conn.sendall(response)
 
                         if request_type == "DELETE":
                             # DELETE /users/<username> HTTP/1.1\r\n
@@ -334,7 +346,8 @@ if __name__ == "__main__":
                                 # meaning there is credentials
                                 auth_value = http_data['Authorization']
                                 basic_str = "Basic "
-                                if auth_value[0:5] != "Basic ":
+                                print("-", auth_value[0:7], "-")
+                                if auth_value[0:7] != " Basic ":
                                     response_status = '400'
                                     response = str.encode(response_proto)
                                     response += b' '
@@ -355,7 +368,7 @@ if __name__ == "__main__":
                                     if not hw2_utils.user_credentials_valid(username_to_check, userpassword_to_check):
                                         authenticated = False
                                         username_to_check = None
-                                        print("User credentials are not valid")
+                                        # print("User credentials are not valid")
                                     else:
                                         authenticated = True
                                         print("Building the Dynamic Page")

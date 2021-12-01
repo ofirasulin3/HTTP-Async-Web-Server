@@ -5,9 +5,11 @@
     db read is blocking
 
 *TODO: update the parsing to support continuous lines
-
+       and update inner loops for better aesthetics
 *TODO: update the error handling to include headers
    and update all headers to include content/len
+
+*check if form opens
 
 *pass on the instructions again
 
