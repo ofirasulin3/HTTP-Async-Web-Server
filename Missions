@@ -4,8 +4,6 @@
     make the searching for file and reading file with await (needs to be non-blocking)
     db read is blocking
 
-*test what happens when there is no authorization field
-
 *TODO: update the parsing to support continuous lines
 
 *TODO: update the error handling to include headers
@@ -36,6 +34,7 @@ done:
   if it's not user, return 401
 *401 for wrong authentication (not a user at all or wrong password)
 * if there is no basic, do nothing and return 400
+*test what happens when there is no authorization field
 
 Questions for rani/Piazza:
 1. is it needed to support Post/delete request without Authorization field? no

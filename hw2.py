@@ -65,8 +65,8 @@ if __name__ == "__main__":
     admin_pass = lines[2].split(" ")[5].split('\'')[1]
     pre_encoded = admin_username+":"+admin_pass
     encoded = base64.b64encode(pre_encoded.encode())
-
-    hw2_utils.user_insert(admin_username, admin_pass)
+    if not hw2_utils.user_exists(admin_username):
+        hw2_utils.user_insert(admin_username, admin_pass)
     # print("decoded admin credentials: ", base64.b64decode(encoded))
     # print(b'YWRtaW46YWRtaW4=' == encoded)
 
@@ -143,9 +143,18 @@ if __name__ == "__main__":
                             userpass_to_handle = http_data['body'][http_data['body'].index("password=") + 9:]
                             print("userpass_to_create: ", userpass_to_handle)
 
-                            auth_value = http_data['Authorization']
-                            if auth_value:  # TODO: there is no check like this. it sends KeyError and exits.
+                            if "Authorization" not in http_data:
+                                response_status = '401'
+                                response = str.encode(response_proto)
+                                response += b' '
+                                response += str.encode(response_status)
+                                response += b' '
+                                response += str.encode("Unauthorized\r\n")
+                                conn.sendall(response)
+                                break
+                            else:
                                 # meaning there is credentials
+                                # auth_value = http_data['Authorization']
                                 basic_str = "Basic "
                                 encoded = auth_value[len(basic_str):]
                                 if auth_value[0:5] != "Basic ":
@@ -228,10 +237,29 @@ if __name__ == "__main__":
                             # header # K\r\n
                             username_to_delete = http_data['Request'].split(' ')[1].split('/')[-1]
                             print(username_to_delete)
-                            auth_value = http_data['Authorization']
-                            if auth_value:  # TODO: there is no check like this. it sends KeyError and exits.
-                                # print("meaning there is credentials")
+
+                            if "Authorization" not in http_data:
+                                response_status = '401'
+                                response = str.encode(response_proto)
+                                response += b' '
+                                response += str.encode(response_status)
+                                response += b' '
+                                response += str.encode("Unauthorized\r\n")
+                                conn.sendall(response)
+                                break
+                            else:
+                                # meaning there is credentials
+                                auth_value = http_data['Authorization']
                                 basic_str = "Basic "
+                                if auth_value[0:5] != "Basic ":
+                                    response_status = '400'
+                                    response = str.encode(response_proto)
+                                    response += b' '
+                                    response += str.encode(response_status)
+                                    response += b' '
+                                    response += str.encode("Bad Request\r\n")
+                                    conn.sendall(response)
+                                    break
                                 encoded = auth_value[len(basic_str):]
 
                                 decoded = base64.b64decode(encoded)
@@ -293,15 +321,34 @@ if __name__ == "__main__":
                             file_content_type = mime_parsing(file_extension)
                             username_to_check = ""
                             userpassword_to_check = ""
-                            auth_value = http_data['Authorization']
-                            if auth_value:
+                            if "Authorization" not in http_data:
+                                response_status = '401'
+                                response = str.encode(response_proto)
+                                response += b' '
+                                response += str.encode(response_status)
+                                response += b' '
+                                response += str.encode("Unauthorized\r\n")
+                                conn.sendall(response)
+                                break
+                            else:
                                 # meaning there is credentials
+                                auth_value = http_data['Authorization']
                                 basic_str = "Basic "
+                                if auth_value[0:5] != "Basic ":
+                                    response_status = '400'
+                                    response = str.encode(response_proto)
+                                    response += b' '
+                                    response += str.encode(response_status)
+                                    response += b' '
+                                    response += str.encode("Bad Request\r\n")
+                                    conn.sendall(response)
+                                    break
                                 encoded = auth_value[len(basic_str):]
                                 decoded = base64.b64decode(encoded)
                                 username_to_check = decoded.split(b':')[0].decode()
                                 # print("admin_username_to_check:", admin_username_to_check)
                                 userpassword_to_check = decoded.split(b':')[1].decode()
+
 
                             if file_extension == "dp":
 
