@@ -1,8 +1,8 @@
 
 
-def dp_parsing(dynamic_page_path, username, authenticated, params):
+def dp_parsing(dynamic_page_path, user, params):
     f = open("gen.py", "w")
-    user = {"authenticated": authenticated, "username": username}
+    # user = {"authenticated": authenticated, "username": username}
 
     with open(dynamic_page_path) as dp:
         line = dp.readline()
@@ -23,8 +23,6 @@ def dp_parsing(dynamic_page_path, username, authenticated, params):
 
                 if tmp_exp != "":
                     f.write(tmp_exp + '\n')
-                if tmp_exp == "</html>":
-                    x = 2
                 if i >= len(line):
                         break
 

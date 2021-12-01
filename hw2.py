@@ -65,6 +65,8 @@ if __name__ == "__main__":
     admin_pass = lines[2].split(" ")[5].split('\'')[1]
     pre_encoded = admin_username+":"+admin_pass
     encoded = base64.b64encode(pre_encoded.encode())
+
+    hw2_utils.user_insert(admin_username, admin_pass)
     # print("decoded admin credentials: ", base64.b64decode(encoded))
     # print(b'YWRtaW46YWRtaW4=' == encoded)
 
@@ -82,8 +84,9 @@ if __name__ == "__main__":
                 s.listen(5)
                 conn, addr = s.accept()
                 with conn:
-                    timeout_start = time.time()
-                    while time.time() < timeout_start + float(timeout_param):
+                    # timeout_start = time.time()
+                    # while time.time() < timeout_start + float(timeout_param):
+                    while True:
                         data = conn.recv(4096)
 
                         if not data:
@@ -123,7 +126,7 @@ if __name__ == "__main__":
                         # POST request is for Creating a User
 
                         if request_type == "POST":
-                            if request.split(' ')[1] != "/users":
+                            if request.split(' ')[1] != "/users" or request.split(' ')[1] != "/users/":
                                 response_status = '501'
                                 response_message = "Not Implemented"
                                 print("501 Not Implemented")
@@ -145,6 +148,15 @@ if __name__ == "__main__":
                                 # meaning there is credentials
                                 basic_str = "Basic "
                                 encoded = auth_value[len(basic_str):]
+                                if auth_value[0:5] != "Basic ":
+                                    response_status = '400'
+                                    response = str.encode(response_proto)
+                                    response += b' '
+                                    response += str.encode(response_status)
+                                    response += b' '
+                                    response += str.encode("Bad Request\r\n")
+                                    conn.sendall(response)
+                                    break
 
                                 decoded = base64.b64decode(encoded)
                                 admin_username_to_check = decoded.split(b':')[0].decode()
@@ -167,7 +179,25 @@ if __name__ == "__main__":
                                         print("Sanity Check: user_exists? ", hw2_utils.user_exists(username_to_handle))
                                 else:
                                     # invalid admin credentials
-                                    print("invalid admin credentials! send the right error (401/403)")
+                                    print("invalid admin credentials!")
+                                    if not hw2_utils.user_credentials_valid(admin_username_to_check, admin_password_to_check):
+                                        response_status = '401'
+                                        response = str.encode(response_proto)
+                                        response += b' '
+                                        response += str.encode(response_status)
+                                        response += b' '
+                                        response += str.encode("Unauthorized\r\n")
+                                        conn.sendall(response)
+                                        break
+                                    else:
+                                        response_status = '403'
+                                        response = str.encode(response_proto)
+                                        response += b' '
+                                        response += str.encode(response_status)
+                                        response += b' '
+                                        response += str.encode("Forbidden\r\n")
+                                        conn.sendall(response)
+                                        break
 
                             else:  # meaning there are no credentials
                                 # In case authorization field doesn't exist,
@@ -224,7 +254,26 @@ if __name__ == "__main__":
 
                                 else:
                                     # invalid admin credentials
-                                    print("invalid admin credentials! send the right error (401/403)")
+                                    print("invalid admin credentials!")
+                                    if not hw2_utils.user_credentials_valid(admin_username_to_check,
+                                                                            admin_password_to_check):
+                                        response_status = '401'
+                                        response = str.encode(response_proto)
+                                        response += b' '
+                                        response += str.encode(response_status)
+                                        response += b' '
+                                        response += str.encode("Unauthorized\r\n")
+                                        conn.sendall(response)
+                                        break
+                                    else:
+                                        response_status = '403'
+                                        response = str.encode(response_proto)
+                                        response += b' '
+                                        response += str.encode(response_status)
+                                        response += b' '
+                                        response += str.encode("Forbidden\r\n")
+                                        conn.sendall(response)
+                                        break
 
 
                         if request_type == "GET":
@@ -239,22 +288,26 @@ if __name__ == "__main__":
                                 response += str.encode("Not Found\r\n")
                                 conn.sendall(response)
                                 break
+
                             file_extension = filename_path.split('.')[1]
                             file_content_type = mime_parsing(file_extension)
+                            username_to_check = ""
+                            userpassword_to_check = ""
+                            auth_value = http_data['Authorization']
+                            if auth_value:
+                                # meaning there is credentials
+                                basic_str = "Basic "
+                                encoded = auth_value[len(basic_str):]
+                                decoded = base64.b64decode(encoded)
+                                username_to_check = decoded.split(b':')[0].decode()
+                                # print("admin_username_to_check:", admin_username_to_check)
+                                userpassword_to_check = decoded.split(b':')[1].decode()
 
                             if file_extension == "dp":
-                                auth_value = http_data['Authorization']
-                                if auth_value:
-                                    # meaning there is credentials
-                                    basic_str = "Basic "
-                                    encoded = auth_value[len(basic_str):]
-                                    decoded = base64.b64decode(encoded)
-                                    username_to_check = decoded.split(b':')[0].decode()
-                                    # print("admin_username_to_check:", admin_username_to_check)
-                                    userpassword_to_check = decoded.split(b':')[1].decode()
 
                                     if not hw2_utils.user_credentials_valid(username_to_check, userpassword_to_check):
                                         authenticated = False
+                                        username_to_check = None
                                         print("User credentials are not valid")
                                     else:
                                         authenticated = True
@@ -266,7 +319,8 @@ if __name__ == "__main__":
                                             key = param.split['='][0]
                                             value = param.split['='][1]
                                             params_dict[key] = value
-                                    dp_parsing(filename_path, username_to_check, authenticated, params_dict)
+                                    user_dict = {"authenticated": authenticated, "username": username_to_check}
+                                    dp_parsing(filename_path, user_dict, params_dict)
 
                                     response = str.encode(response_proto)
                                     response += b' '
@@ -287,8 +341,25 @@ if __name__ == "__main__":
                                     conn.sendall(response)
                                     output.close()
 
-
-
+                            elif filename_path == "/users.db" or filename_path == "/config.py":
+                                if not hw2_utils.user_credentials_valid(username_to_check, userpassword_to_check):
+                                    response_status = '401'
+                                    response = str.encode(response_proto)
+                                    response += b' '
+                                    response += str.encode(response_status)
+                                    response += b' '
+                                    response += str.encode("Unauthorized\r\n")
+                                    conn.sendall(response)
+                                    break
+                                else:
+                                    response_status = '403'
+                                    response = str.encode(response_proto)
+                                    response += b' '
+                                    response += str.encode(response_status)
+                                    response += b' '
+                                    response += str.encode("Forbidden\r\n")
+                                    conn.sendall(response)
+                                    break
 
                             else:
                                 print("regular files logic")
@@ -322,8 +393,8 @@ if __name__ == "__main__":
 
 
 
-                        # 401 unauthorized
-                        # 403 forbidden
+                        # 401 Unauthorized
+                        # 403 Forbidden
 
                         # 409 conflict
 

@@ -1,20 +1,17 @@
-Question for rani/Piazza:
-1. is it needed to support Post/GET request without Authorization field?
-2. what do we need to do with query string?
-3. Is the template parser structure is good? (show him the function),
-   do we need to return something?
 
-1. TODO: add support for Post request without Authorization field, if needed
-
-2. TODO: understand and implement async server ## Most important(look at tips)
+* TODO: understand and implement async server (look at tips)
     make the read from mime.json await (needs to be non-blocking)
+    make the searching for file and reading file with await (needs to be non-blocking)
+    db read is blocking
 
-3. update the error handling to include headers
+*test what happens when there is no authorization field
+
+*TODO: update the parsing to support continuous lines
+
+*TODO: update the error handling to include headers
    and update all headers to include content/len
 
-4. make sure no client can access the users.db file and the config.py file.
-
-5. pass on the instructions again
+*pass on the instructions again
 
 
 done:
@@ -31,5 +28,17 @@ done:
 7. in GET dp requests, check for valid users
 8. check for /users in a post request
 9. for GET requests, support for getting params
+10. add support for Post request without Authorization field, if needed
+* build dictionary outside parsing
+*delete the timer handling
+*make sure no client can access the users.db file and the config.py file.- 403 Forbidden
+*when user (not admin) sends POST/DELETE requests we should return 403 (check if it's valid user)
+  if it's not user, return 401
+*401 for wrong authentication (not a user at all or wrong password)
+* if there is no basic, do nothing and return 400
 
-
+Questions for rani/Piazza:
+1. is it needed to support Post/delete request without Authorization field? no
+2. what do we need to do with query string? we did
+3. Is the template parser structure is good (show him the function)? yes
+   do we need to return something?
