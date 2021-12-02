@@ -1,16 +1,13 @@
 
 
-
-
-3. check special characters in password/querystring
-
-2. TODO: understand and implement async server (look at tips)
+1. TODO: understand and implement async server (look at tips)
     make the read from mime.json await (needs to be non-blocking)
     make the searching for file and reading file with await (needs to be non-blocking)
     db read is blocking
-*tests (start from blue marks)
-*check again if form opens
+2. check special characters in password/querystring
 *delete comments
+*check again if form opens
+*tests (start from blue marks)
 
 
 

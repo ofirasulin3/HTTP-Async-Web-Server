@@ -86,6 +86,7 @@ if __name__ == "__main__":
                             conn.sendall(response)
                             break
 
+
                         all_http_requests = ["GET", "POST", "DELETE", "OPTIONS", "HEAD", "PUT", "CONNECT", "TRACE"]
                         print(data)
                         http_data = hw2_utils.decode_http(data)
