@@ -1,11 +1,11 @@
 
 
-1. TODO: understand and implement async server (look at tips)
-    make the read from mime.json await (needs to be non-blocking)
-    make the searching for file and reading file with await (needs to be non-blocking)
-    db read is blocking
-2. check special characters in password/querystring (maybe charset_
-*delete comments and prints
+1. make the searching for file await
+2. make reading file with await (needs to be non-blocking):
+    async with aiofiles.open(file_name, 'rb') as f:
+        chunk = await f.read(64*1024)
+3. check special characters in password/querystring (maybe charset?)
+*delete comments and prints and redundant imports
 *check again if form opens
 *tests (start from blue marks)
 
@@ -43,6 +43,8 @@ done:
    (only if the configuration file includes the suitable mime-type).\
 *if an authenticated user asks to delete or create (post) a user, return 403 forbidden
 *pass on the instructions again
+*understand and implement async server (look at tips)
+*make the read from mime.json await (needs to be non-blocking)
 
 Questions for rani/Piazza:
 1. is it needed to support Post/delete request without Authorization field? no

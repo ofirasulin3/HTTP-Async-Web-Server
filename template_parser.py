@@ -1,6 +1,6 @@
 import re
 
-def dp_parsing(dynamic_page_path, user, params):
+async def dp_parsing(dynamic_page_path, user, params):
     f = open("gen.py", "w")
     tmp_exp = ""
     tmp_str = ""
