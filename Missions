@@ -4,8 +4,8 @@
     make the read from mime.json await (needs to be non-blocking)
     make the searching for file and reading file with await (needs to be non-blocking)
     db read is blocking
-2. check special characters in password/querystring
-*delete comments
+2. check special characters in password/querystring (maybe charset_
+*delete comments and prints
 *check again if form opens
 *tests (start from blue marks)
 

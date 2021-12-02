@@ -6,8 +6,8 @@ import base64
 import os
 from template_parser import dp_parsing
 
-
 # def check_error(data, conn):
+
 
 def mime_parsing(key):
     f = open("mime.json", "rt")
@@ -31,8 +31,8 @@ def build_html_for_not_found_404(url):
     html_string += "</html>\r\n"
     return html_string
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     # getting parameters from config file
     config_file = open("config.py", "r")
     lines = config_file.readlines()
@@ -44,15 +44,6 @@ if __name__ == "__main__":
     encoded = base64.b64encode(pre_encoded.encode())
     if not hw2_utils.user_exists(admin_username):
         hw2_utils.user_insert(admin_username, admin_pass)
-    # print("decoded admin credentials: ", base64.b64decode(encoded))
-    # print(b'YWRtaW46YWRtaW4=' == encoded)
-
-    # conn_db = sqlite3.connect('users.db')
-    # str_test = "DELETE /users/david HTTP/1.1\r\n"
-    # username_to_delete = str_test.split(' ')[1].split('/')[-1]
-    # print(username_to_delete)
-
-    # print(hw2_utils.user_credentials_valid("user555", "12345"))
 
     while True:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -85,7 +76,6 @@ if __name__ == "__main__":
                                                + response_headers_content_type + "\r\n"
                             conn.sendall(response)
                             break
-
 
                         all_http_requests = ["GET", "POST", "DELETE", "OPTIONS", "HEAD", "PUT", "CONNECT", "TRACE"]
                         print(data)
@@ -125,25 +115,16 @@ if __name__ == "__main__":
                             response_status = '501'
                             response_message = "Not Implemented"
 
-                        # POST request is for Creating a User
+                        # POST request - for Creating a User
                         if request_type == "POST":
                             if request.split(' ')[1] != "/users" or request.split(' ')[1] != "/users/":
                                 response_status = '501'
                                 response_message = "Not Implemented"
                                 print("501 Not Implemented")
 
-                            # http_data_example =
-                            # "POST /users HTTP/1.1\r\n
-                            # header 1\r\n …
-                            # Content-Type: application/x-www-form-urlencoded
-                            # Authorization: Basic … …
-                            # header K\r\n
-                            # username=user1&password=1234"
                             body = http_data['body']
                             username_to_handle = body[body.index("username=") + 9:body.index("&")]
-                            print("username_to_create: ", username_to_handle)
                             userpass_to_handle = body[body.index("password=") + 9:]
-                            print("userpass_to_create: ", userpass_to_handle)
 
                             if "Authorization" not in http_data:
                                 response_status = '401'
@@ -162,10 +143,7 @@ if __name__ == "__main__":
                                 response += b'\r\n'  # to separate headers from body
                                 conn.sendall(response)
                                 break
-                            else:
-                                # meaning there is credentials
-
-                                # auth_value = http_data['Authorization']
+                            else:  # meaning there is credentials
                                 auth_value = http_data['Authorization']
                                 basic_str = "Basic "
                                 encoded = auth_value[len(basic_str):]
@@ -188,14 +166,11 @@ if __name__ == "__main__":
                                     break
                                 decoded = base64.b64decode(encoded)
                                 admin_username_to_check = decoded.split(b':')[0].decode()
-                                # print("admin_username_to_check:", admin_username_to_check)
                                 admin_password_to_check = decoded.split(b':')[1].decode()
-                                # print("admin_password_to_check:", admin_password_to_check)
                                 if admin_username_to_check == admin_username \
                                         and admin_password_to_check == admin_pass:
                                     # create the user!
                                     # add username_to_handle and userpass_to_handle to DB
-                                    # print("create the user! add to the database")
                                     if hw2_utils.user_exists(username_to_handle):
                                         response_status = '409'
                                         response = str.encode(response_proto)
@@ -231,7 +206,7 @@ if __name__ == "__main__":
                                         conn.sendall(response)
                                         break
                                     else:
-                                        print("User Inserted!")
+                                        # User Inserted!
                                         response_status = '200'
                                         response = str.encode(response_proto)
                                         response += b' '
@@ -306,33 +281,7 @@ if __name__ == "__main__":
                                         conn.sendall(response)
                                         break
 
-                            # else: # meaning there are no credentials
-                            #     # In case authorization field doesn't exist,
-                            #     # we will send a response with a form for authentication:
-                            #     response = str.encode(response_proto)
-                            #     response += b' '
-                            #     response_status = '401'
-                            #     response += str.encode(response_status)
-                            #     response += b' '
-                            #     response += str.encode("Unauthorized\r\n")
-                            #     response += b'\r\n'
-                            #
-                            #     current_date = datetime.datetime.now()
-                            #     response_headers_date = current_date.strftime("%d-%b-%Y (%H:%M:%S.%f)")
-                            #     response_headers_content_len = "Content-Length: 0"
-                            #     response_headers = response_headers_date + "\r\n" + str(response_headers_content_len) + "\r\n"
-                            #     response += str.encode(response_headers)
-                            #     response += str.encode("Connection: keep-alive\r\n")
-                            #     response += str.encode("WWW-Authenticate: Basic realm=\"HW2 realm\"\r\n")
-                            #     response += b'\r\n'  # to separate headers from body
-                            #     conn.sendall(response)
-
                         if request_type == "DELETE":
-                            # DELETE /users/<username> HTTP/1.1\r\n
-                            # header
-                            # 1\r\n
-                            # Authorization: Basic … …
-                            # header # K\r\n
                             username_to_delete = http_data['Request'].split(' ')[1].split('/')[-1]
                             print(username_to_delete)
 
@@ -382,7 +331,7 @@ if __name__ == "__main__":
                                 if admin_username_to_check == admin_username \
                                         and admin_password_to_check == admin_pass:
                                     # Check if the user exists on DB.
-                                    # if user doesn't exists return Error 409 Conflict?
+                                    # if user doesn't exists return Error 409 Conflict
                                     if not hw2_utils.user_exists(username_to_delete):
                                         response_status = '409'
                                         response = str.encode(response_proto)
@@ -457,7 +406,6 @@ if __name__ == "__main__":
                                     break
                                 else:
                                     # invalid admin credentials
-                                    print("invalid admin credentials!")
                                     if not hw2_utils.user_credentials_valid(admin_username_to_check,
                                                                             admin_password_to_check):
                                         response_status = '401'
@@ -506,11 +454,6 @@ if __name__ == "__main__":
                                 response += str.encode("Not Found\r\n")
                                 current_date = datetime.datetime.now()
                                 response_headers_date = current_date.strftime("%d-%b-%Y (%H:%M:%S.%f)")
-                                # f = open('404Page.html', 'w')
-                                # message1 = html_body_404
-                                # f.write(message1)
-                                # f.close()
-                                # output = open('404Page.html', 'rb')
                                 response_headers_content_len_size = os.path.getsize('404Page.html')
                                 html_body_404 = build_html_for_not_found_404(URL)
                                 response_headers_content_len_size = len(html_body_404)
@@ -592,17 +535,16 @@ if __name__ == "__main__":
                                 encoded = auth_value[len(basic_str):]
                                 decoded = base64.b64decode(encoded)
                                 username_to_check = decoded.split(b':')[0].decode()
-                                # print("admin_username_to_check:", admin_username_to_check)
                                 userpassword_to_check = decoded.split(b':')[1].decode()
 
                             if file_extension == "dp":
                                 if not hw2_utils.user_credentials_valid(username_to_check, userpassword_to_check):
                                     authenticated = False
                                     username_to_check = None
-                                    # print("User credentials are not valid")
+                                    # User credentials are not valid
                                 else:
                                     authenticated = True
-                                print("Building the Dynamic Page")
+                                # Building the Dynamic Page
                                 params_dict = {}
                                 if URL.find('?') != -1:
                                     params_str = URL.split('?')[1].split['&']
@@ -671,7 +613,7 @@ if __name__ == "__main__":
                                     break
 
                             else:
-                                print("regular files logic")
+                                # regular files logic
                                 response = str.encode(response_proto)
                                 response += b' '
                                 response_status = '200'  # in case of success (valid) return status 200
@@ -700,8 +642,7 @@ if __name__ == "__main__":
                         response += str.encode("\r\n")
                         conn.sendall(response)
                         break
-                except:
-                    # HERE is 500
+                except:  # HERE is 500
                     response_proto = 'HTTP/1.1'
                     response_status = '500'
                     response = str.encode(response_proto)
