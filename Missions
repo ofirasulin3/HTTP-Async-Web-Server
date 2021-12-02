@@ -1,15 +1,17 @@
 
-* TODO: understand and implement async server (look at tips)
+
+
+
+3. check special characters in password/querystring
+
+2. TODO: understand and implement async server (look at tips)
     make the read from mime.json await (needs to be non-blocking)
     make the searching for file and reading file with await (needs to be non-blocking)
     db read is blocking
+*tests (start from blue marks)
+*check again if form opens
+*delete comments
 
-*TODO: update the error handling to include headers
-   and update all headers to include content/len
-
-*check if form opens
-
-*pass on the instructions again
 
 
 done:
@@ -36,6 +38,14 @@ done:
 * if there is no basic, do nothing and return 400
 *test what happens when there is no authorization field
 *update the parsing to support continuous lines and update inner loops for better aesthetics
+*update the error handling to include headers and update all headers to include content/len
+*what's not in the mime needs to be returned as plain text
+*add an html file when Not Found (like in the pdf)
+*add Connection: close
+   and The mime-type of the response content
+   (only if the configuration file includes the suitable mime-type).\
+*if an authenticated user asks to delete or create (post) a user, return 403 forbidden
+*pass on the instructions again
 
 Questions for rani/Piazza:
 1. is it needed to support Post/delete request without Authorization field? no
