@@ -11,8 +11,6 @@ from aiohttp import web
 async def mime_parsing(key):
     async with aiofiles.open("mime.json", 'rt') as f:
         d = json.loads(await f.read())
-    # async with aiofiles.open("mime.json", 'rt') as f:
-    #     d = json.load(f)
         list = d["mime-mapping"]
         for item in list:
             if item["extension"] == key:
@@ -21,26 +19,6 @@ async def mime_parsing(key):
         f.close()
         return -1
 
-
-    # f = open("mime.json", "rt")
-    # d = json.load(f)
-    # list = d["mime-mapping"]
-    # for item in list:
-    #     if item["extension"] == key:
-    #         return item["mime-type"]
-    # return -1
-
-# async def build_html_for_not_found_404(url):
-#     html_string = "<!DOCTYPE html> <html> \r\n"
-#     html_string += "<head>\r\n"
-#     html_string += "<title>404 Not Found</title>\r\n"
-#     html_string += "</head>\r\n"
-#     html_string += "<body>\r\n"
-#     html_string += "<h1>Not Found</h1>\r\n"
-#     html_string += "<p>The requested URL " + url + " was not found on the server</p>\r\n"
-#     html_string += "</body>\r\n"
-#     html_string += "</html>\r\n"
-#     return html_string
 
 async def build_html(status, reason, info):
     html_string = "<!DOCTYPE html> <html> \r\n"
@@ -54,7 +32,7 @@ async def build_html(status, reason, info):
     html_string += "</html>\r\n"
     return html_string
 
-# if __name__ == "__main__":
+
 async def main():
     try:
         server = web.Server(handler)
@@ -63,11 +41,13 @@ async def main():
         site = web.TCPSite(runner, 'localhost', 8001)
         await site.start()
     except Exception as e3:
-        print("..e3 is: ", e3)
+        # print("..e3 is: ", e3)
+        return web.Response(body="", status=500, reason="Internal Server Error",
+                            headers={'Content-Length': "0", 'Connection': "close",
+                                     "charset": "utf-8"})
 
 async def handler(new_request):
     # getting parameters from config file
-    # config_file = open("config.py", "r")
     async with aiofiles.open("config.py", 'r') as config_file:
         lines = await config_file.readlines()
         config_file.close()
@@ -83,36 +63,19 @@ async def handler(new_request):
 
     try:
         all_http_requests = ["GET", "POST", "DELETE", "OPTIONS", "HEAD", "PUT", "CONNECT", "TRACE"]
-        # http_data = hw2_utils.decode_http(data)
         response_proto = 'HTTP/1.1'
-        # response_proto = request_.protocol
         response_status = ""
-        # request = http_data["Request"].split('\n')[0]
 
-        # URL = request.split(' ')[1]
         URL = new_request.url.path
         request_type = new_request.method
         request = request_type + " " + URL + " " + response_proto
         new_body = await new_request.content.readany()
-        # request_type = request.split(' ')[0]
 
-        # if data == b'GET / HTTP/1.1\r\nHost: localhost:8001\r\nConnection: keep-alive\r\nCache-Control: max-age=0\r\nsec-ch-ua: " Not A;Brand";v="99", "Chromium";v="96", "Google Chrome";v="96"\r\nsec-ch-ua-mobile: ?0\r\nsec-ch-ua-platform: "Windows"\r\nUpgrade-Insecure-Requests: 1\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9\r\nSec-Fetch-Site: none\r\nSec-Fetch-Mode: navigate\r\nSec-Fetch-User: ?1\r\nSec-Fetch-Dest: document\r\nAccept-Encoding: gzip, deflate, br\r\nAccept-Language: he,en-US;q=0.9,en;q=0.8\r\nCookie: Pycharm-46a7fce2=29a7169a-5c2a-4123-bbb4-2126e2fd8556\r\n\r\n':
-        #     response_status = '401'
-        #     response = str.encode(response_proto)
-        #     response += b' '
-        #     response += str.encode(response_status)
-        #     response += b' '
-        #     response += str.encode("Unauthorized\r\n")
-        #     current_date = datetime.datetime.now()
-        #     response_headers_date = current_date.strftime("%d-%b-%Y (%H:%M:%S.%f)")
-        #     response_headers_content_len = "Content-Length: 0"
-        #     response_headers = response_headers_date + "\r\n" + response_headers_content_len + "\r\n"
-        #     response += str.encode(response_headers)
-        #     response += str.encode("Connection: keep-alive\r\n")
-        #     response += str.encode("WWW-Authenticate: Basic realm=\"HW2 realm\"\r\n")
-        #     response += b'\r\n'  # to separate headers from body
-        #     conn.sendall(response)
-        #     break
+        # if str(new_request) == '<BaseRequest GET /example7.dp >':
+        #     return web.Response(body="", status=401, reason="Unauthorized",
+        #                         headers={'Content-Length': "0", 'Connection': "keep-alive",
+        #                                  'WWW-Authenticate': "Basic realm=\"HW2 realm\"",
+        #                                  "charset": "utf-8"})
 
         if request_type not in all_http_requests:
             return web.Response(body="", status=400, reason="Bad Request",
@@ -131,7 +94,6 @@ async def handler(new_request):
                                              "charset": "utf-8"})
 
             body = new_body.decode()
-            # body = http_data['body']
             username_to_handle = body[body.index("username=") + 9:body.index("&")]
             userpass_to_handle = body[body.index("password=") + 9:]
 
@@ -199,7 +161,6 @@ async def handler(new_request):
                 return web.Response(body="", status=400, reason="Bad Request",
                                     headers={'Content-Length': "0", 'Connection': "close",
                                              "charset": "utf-8"})
-            # username_to_delete = http_data['Request'].split(' ')[1].split('/')[-1]
             username_to_delete = URL.split('/')[-1]
 
             if "Authorization" not in new_request.headers:
@@ -278,11 +239,6 @@ async def handler(new_request):
             file_extension = filename_path.split('.')[1]
             file_content_type = 0
             if filename_path == "users.db" or filename_path == "config.py":
-                # if not hw2_utils.user_credentials_valid(username_to_check, userpassword_to_check):
-                #     return web.Response(body="", status=401, reason="Unauthorized",
-                #                         headers={'Content-Length': "0", 'Connection': "close",
-                #                                  "charset": "utf-8"})
-                # else:
                 return web.Response(body="", status=403, reason="Forbidden",
                                         headers={'Content-Length': "0", 'Connection': "close",
                                                  "charset": "utf-8"})
@@ -340,7 +296,7 @@ async def handler(new_request):
                                              "charset": "utf-8"})
 
     except Exception as e2:
-        print("..e2 is: ", e2)  # HERE is 500
+        # print("..e2 is: ", e2)  # HERE is 500
         return web.Response(body="", status=500, reason="Internal Server Error",
                                             headers={'Content-Length': "0", 'Connection': "close",
                                                      "charset": "utf-8"})
@@ -350,6 +306,9 @@ try:
     loop.run_forever()
     # loop.close()
 except Exception as e1:
-    print("..e1 is: ", e1)
+    # print("..e1 is: ", e1)
+    web.Response(body="", status=500, reason="Internal Server Error",
+                        headers={'Content-Length': "0", 'Connection': "close",
+                                 "charset": "utf-8"})
 
 

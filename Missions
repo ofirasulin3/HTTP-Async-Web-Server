@@ -1,11 +1,4 @@
 
-
-*check again if form opens
-
-*delete comments and prints
-
-
-
 done:
 
 1. choose the right package for parsing the Mime json file and write code for extracting right content type
@@ -46,6 +39,9 @@ done:
         chunk = await f.read(64*1024)
 *tests (start from blue marks)
 *check special characters in password/querystring (maybe charset?)
+*check again if form opens
+*delete comments and prints
+
 
 Questions for Piazza:
 1. is it needed to support Post/delete request without Authorization field? no
