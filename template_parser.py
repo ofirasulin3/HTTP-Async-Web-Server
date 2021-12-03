@@ -1,5 +1,6 @@
 import re
 
+
 async def dp_parsing(dynamic_page_path, user, params):
     f = open("gen.py", "w")
     tmp_exp = ""
@@ -16,7 +17,7 @@ async def dp_parsing(dynamic_page_path, user, params):
             s_end = match.end()
             tmp_str = match.group()
             f.write(eval(tmp_str[2:-2]) + "\n")
-        if len(text) - s_end> 0:
+        if len(text) - s_end > 0:
             tmp_exp = text[s_end:len(text)]
             f.write(tmp_exp + "\n")
         f.close()

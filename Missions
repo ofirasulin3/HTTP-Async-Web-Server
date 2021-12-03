@@ -1,13 +1,8 @@
 
 
-1. make the searching for file await
-2. make reading file with await (needs to be non-blocking):
-    async with aiofiles.open(file_name, 'rb') as f:
-        chunk = await f.read(64*1024)
-3. check special characters in password/querystring (maybe charset?)
-*delete comments and prints and redundant imports
 *check again if form opens
-*tests (start from blue marks)
+
+*delete comments and prints
 
 
 
@@ -45,8 +40,14 @@ done:
 *pass on the instructions again
 *understand and implement async server (look at tips)
 *make the read from mime.json await (needs to be non-blocking)
+*make the searching for file await
+*make reading file with await (needs to be non-blocking):
+    async with aiofiles.open(file_name, 'rb') as f:
+        chunk = await f.read(64*1024)
+*tests (start from blue marks)
+*check special characters in password/querystring (maybe charset?)
 
-Questions for rani/Piazza:
+Questions for Piazza:
 1. is it needed to support Post/delete request without Authorization field? no
 2. what do we need to do with query string? we did
 3. Is the template parser structure is good (show him the function)? yes

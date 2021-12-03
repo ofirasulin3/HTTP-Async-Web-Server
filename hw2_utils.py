@@ -1,8 +1,10 @@
 import sqlite3
 import os
 
-def check_if_file_exists(path_photo):
+
+async def check_if_file_exists(path_photo):
     return os.path.exists(path_photo)
+
 
 def user_exists(username_to_check):
     conn = None
@@ -14,12 +16,15 @@ def user_exists(username_to_check):
         #                 " WHERE username = {var}").format(var=sql.Literal(username_to_check))
         # rows_effected, res = conn.execute(str(query))
         # rows_effected, res = conn.execute("SELECT username, password FROM Users WHERE username = (?)", username_to_check)
+        # if(username_to_check=="user2"):
+        #     cur.execute("SELECT * FROM Users")
+        # else:
         cur.execute("SELECT username FROM Users WHERE username=:user_name",
                     {"user_name": username_to_check})
         rows_effected = cur.fetchall()
         conn.commit()
     except Exception as e:
-        print("..e is: ", e)
+        # print("..e is: ", e)
         conn.close()
         return False
     conn.close()
@@ -46,7 +51,7 @@ def user_credentials_valid(username_to_check, password_to_check):
         rows_effected = cur.fetchall()
         conn.commit()
     except Exception as e:
-        print("..e is: ", e)
+        # print("..e is: ", e)
         conn.close()
         return False
     conn.close()
@@ -67,7 +72,7 @@ def user_insert(username_to_insert, password_to_insert):
 
         conn.commit()
     except Exception as e:
-        print("e is: ", e)
+        # print("e is: ", e)
         conn.close()
         return False
     conn.close()
@@ -91,7 +96,7 @@ def user_delete(username_to_delete):
             conn.close()
             return False
     except Exception as e:
-        print("..e is: ", e)
+        # print("..e is: ", e)
         conn.close()
         return False
     conn.close()
@@ -105,6 +110,8 @@ The first request line (e.g. "GET www.google.com ....") key is 'Request'
 input: HTTP raw request, in bytes.
 output: A dictionary of the parsed request
 '''
+
+
 def decode_http(http_data):
     http_dict = {}
     fields = http_data.decode('utf-8').split("\r\n")  # convert to string from bytes
